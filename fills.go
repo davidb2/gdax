@@ -14,7 +14,6 @@ const (
 	Taker = "T"
 )
 
-// A Fill represents a fill order.
 type Fill struct {
 	TradeId   int64      `json:"trade_id"`
 	ProductId string     `json:"product_id"`
@@ -28,19 +27,16 @@ type Fill struct {
 	Side      string     `json:"side"`
 }
 
-// A FillCollection is an iterator of Fills.
 type FillCollection struct {
 	pageableCollection
 	orderId   *uuid.UUID
 	productId string
 }
 
-// GetFills gets all fills with the specified orderIds.
 func (accessInfo *AccessInfo) GetFills(orderId ...*uuid.UUID) *FillCollection {
 	return accessInfo.GetFillsForProduct("", orderId...)
 }
 
-// GetFillsForProduct gets all fills for a specified productId and specified orderIds.
 func (accessInfo *AccessInfo) GetFillsForProduct(productId string, orderId ...*uuid.UUID) *FillCollection {
 	var realOrderId *uuid.UUID
 	if len(orderId) > 0 {
@@ -54,7 +50,6 @@ func (accessInfo *AccessInfo) GetFillsForProduct(productId string, orderId ...*u
 	return &fillCollection
 }
 
-// HasNext determines if there is another Fill in this iterator.
 func (c *FillCollection) HasNext() bool {
 	// GET /fills
 	var (
@@ -74,7 +69,6 @@ func (c *FillCollection) HasNext() bool {
 	return c.pageableCollection.hasNext(http.MethodGet, "/fills", params, "", &fills)
 }
 
-// Next gets the next Fill from the iterator.
 func (c *FillCollection) Next() (*Fill, error) {
 	fill, err := c.pageableCollection.next()
 	if err != nil {

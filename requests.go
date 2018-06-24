@@ -21,7 +21,6 @@ import (
 
 const EndPoint = "https://api-public.sandbox.gdax.com"
 
-// An AccessInfo stores credentials.
 type AccessInfo struct {
 	PublicKey  string `json:"public_api"`
 	PrivateKey string `json:"private_api"`
@@ -29,7 +28,6 @@ type AccessInfo struct {
 	Client     *http.Client
 }
 
-// RetrieveAccessInfoFromEnvironmentVariables retrieves credentials from environment variables.
 func RetrieveAccessInfoFromEnvironmentVariables() (*AccessInfo, error) {
 	var accessInfo AccessInfo
 
@@ -40,7 +38,6 @@ func RetrieveAccessInfoFromEnvironmentVariables() (*AccessInfo, error) {
 	return &accessInfo, nil
 }
 
-// RetrieveAccessInfoFromFile retrieves credentials from a specified file.
 func RetrieveAccessInfoFromFile(fileName string) (*AccessInfo, error) {
 	var accessInfo AccessInfo
 
@@ -57,7 +54,6 @@ func RetrieveAccessInfoFromFile(fileName string) (*AccessInfo, error) {
 	return &accessInfo, nil
 }
 
-// collectionRequest is a creates and handles a request and its cursors.
 func (accessInfo *AccessInfo) collectionRequest(method, path, jsonBody string) (string, *pagination, error) {
 	var errorMessage map[string]string
 
@@ -89,7 +85,6 @@ func (accessInfo *AccessInfo) collectionRequest(method, path, jsonBody string) (
 	return string(body), &cursor, nil
 }
 
-// request creates and handles a request and parses the marshals the json body response into the specified struct.
 func (accessInfo *AccessInfo) request(method, path, jsonBody string, v interface{}) (*pagination, error) {
 	var errorMessage map[string]string
 
@@ -127,7 +122,6 @@ func (accessInfo *AccessInfo) request(method, path, jsonBody string, v interface
 	return &cursor, nil
 }
 
-// createRequest builds, creates, and sends an HTTP request.
 func (accessInfo *AccessInfo) createRequest(method, requestPath, body string) (*http.Request, error) {
 	// https://docs.gdax.com/#signing-a-message
 
@@ -165,8 +159,6 @@ func (accessInfo *AccessInfo) createRequest(method, requestPath, body string) (*
 	return req, nil
 }
 
-// createWebsocketConnection creates a websocket connection.
-// This function does not block; this function creates a go routine.
 func createWebsocketConnection(addr string, initialMessage []byte, messageType chan string, jsonString chan []byte, errorChan chan error) error {
 	var wsDialer ws.Dialer
 	conn, _, err := wsDialer.Dial(addr, nil)

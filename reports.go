@@ -15,13 +15,11 @@ const (
 	Csv   = "csv"
 )
 
-// A ReportParams stores the start and end date of a report response.
 type ReportParams struct {
 	StartDate *time.Time `json:"start_date,string,omitempty"`
 	EndDate   *time.Time `json:"end_date,string,omitempty"`
 }
 
-// A Report represents a report.
 type Report struct {
 	Type      string     `json:"type"`
 	StartDate *time.Time `json:"start_date,string"`
@@ -41,7 +39,6 @@ type Report struct {
 	Params      *ReportParams `json:"params,omitempty"`
 }
 
-// CreateReport submits a report request.
 func (accessInfo *AccessInfo) CreateReport(report *Report) (*Report, error) {
 	// POST /reports
 	var reportResponse Report
@@ -60,7 +57,6 @@ func (accessInfo *AccessInfo) CreateReport(report *Report) (*Report, error) {
 	return &reportResponse, err
 }
 
-// GetReportStatus retrieves the status of a submitted report.
 func (accessInfo *AccessInfo) GetReportStatus(reportId *uuid.UUID) (*Report, error) {
 	// GET /reports/:report_id
 	var reportStatus Report

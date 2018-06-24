@@ -25,51 +25,46 @@ const (
 	addr              = "wss://ws-feed.gdax.com"
 )
 
-// A Message allows for the retrieval of the type of the message.
+// interfaces
+
 type Message interface {
 	MessageType() string
 }
 
-// A message stores information about a single message sent in a channel.
+// structs
+
 type message struct {
 	Type      string `json:"type"`
 	ProductId string `json:"product_id,,omitempty"`
 }
 
-// A Bid stores a single bid from a snapshot.
 type Bid struct {
 	Price float64 `json:"price"`
 	Size  float64 `json:"size"`
 }
 
-// A Ask stores a single ask from a snapshot.
 type Ask struct {
 	Price float64 `json:"price"`
 	Size  float64 `json:"size"`
 }
 
-// A Change stores a single change from an L2Update.
 type Change struct {
 	Side  string  `json:"side"`
 	Price float64 `json:"price"`
 	Size  float64 `json:"size"`
 }
 
-// An Error stores information about the error message in the event something invalid was sent across the channel.
 type Error struct {
 	message
 	Message string `json:"message"`
 }
 
-// A Subscription stores information about a specific channel subscription.
-// This is needed to initiate any channel communications.
 type Subscription struct {
 	Type       string   `json:"type"`
 	Channels   []string `json:"channels"`
 	ProductIds []string `json:"product_ids"`
 }
 
-// A Heartbeat is channel message sent after subscribing to the heartbeat channel.
 type Heartbeat struct {
 	message
 	Sequence    int64      `json:"sequence"`
@@ -77,7 +72,6 @@ type Heartbeat struct {
 	Time        *time.Time `json:"time,string"`
 }
 
-// A Ticker is channel message sent after subscribing to the ticker channel.
 type Ticker struct {
 	message
 	TradeId   int64      `json:"trade_id"`
@@ -91,7 +85,6 @@ type Ticker struct {
 	BestAsk   float64    `json:"best_ask,string"`
 }
 
-// A Snapshot is channel message sent after subscribing to the snapshot channel.
 type Snapshot struct {
 	message
 	ProductId string `json:"product_id"`
@@ -99,13 +92,11 @@ type Snapshot struct {
 	Asks      []Ask  `json:"asks"`
 }
 
-// A L2Update is channel message sent after subscribing to the L2Update channel.
 type L2Update struct {
 	message
 	Changes []Change `json:"changes"`
 }
 
-// A Match is channel message sent after subscribing to the match channel.
 type Match struct {
 	message
 	Time         *time.Time `json:"time,string"`
@@ -118,17 +109,16 @@ type Match struct {
 	Side         string     `json:"side"`
 }
 
-// Error returns the message of an Error.
+// struct functions
+
 func (err Error) Error() string {
 	return err.Message
 }
 
-// MessageType returns the Type of a message.
 func (m message) MessageType() string {
 	return m.Type
 }
 
-// UnmarshalJSON converts a JSON bytes stream into an L2Update.
 func (m *L2Update) UnmarshalJSON(b []byte) error {
 	var fields map[string]interface{}
 	if err := json.Unmarshal(b, &fields); err != nil {
@@ -158,7 +148,6 @@ func (m *L2Update) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// UnmarshalJSON converts a JSON bytes stream into an Snapshot.
 func (m *Snapshot) UnmarshalJSON(b []byte) error {
 	var fields map[string]interface{}
 	if err := json.Unmarshal(b, &fields); err != nil {
@@ -199,8 +188,8 @@ func (m *Snapshot) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// Feed makes a subscription to the specified channel and sends any incoming messages to the specified message handler.
-// Note that this function is blocking; this function only terminates if the connection is dropped/terminated or an error is sent.
+// functions
+
 func Feed(s *Subscription, messageHandler func(Message)) error {
 	body, err := json.Marshal(*s)
 	if err != nil {
