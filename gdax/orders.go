@@ -3,11 +3,12 @@ package gdax
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/imdario/mergo"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/imdario/mergo"
 )
 
 const (
