@@ -1,9 +1,9 @@
 package gdax
 
 import (
-	"github.com/google/uuid"
 	"net/http"
-	// "github.com/mitchellh/mapstructure"
+
+	"github.com/google/uuid"
 )
 
 // A CoinbaseAccount stores information about a specific coinbase account.
