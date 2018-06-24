@@ -1,11 +1,12 @@
 package main
 
 import (
-	"./gdax"
 	"flag"
 	"io/ioutil"
 	"log"
 	"math/big"
+
+	"./gdax"
 )
 
 var logToStdout bool

@@ -2,10 +2,11 @@ package gdax
 
 import (
 	"encoding/json"
-	"github.com/google/uuid"
-	"github.com/imdario/mergo"
 	"net/http"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/imdario/mergo"
 )
 
 const (

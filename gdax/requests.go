@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	ws "github.com/gorilla/websocket"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -16,6 +15,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	ws "github.com/gorilla/websocket"
 )
 
 const EndPoint = "https://api-public.sandbox.gdax.com"
