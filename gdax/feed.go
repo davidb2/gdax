@@ -3,9 +3,10 @@ package gdax
 import (
 	"encoding/json"
 	"errors"
-	"github.com/google/uuid"
 	"strconv"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const (

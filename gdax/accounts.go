@@ -2,9 +2,10 @@ package gdax
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"net/http"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const (
