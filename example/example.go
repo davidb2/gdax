@@ -6,7 +6,7 @@ import (
 	"log"
 	"math/big"
 
-	"./gdax"
+	"github.com/ljeabmreosn/gdax"
 )
 
 var logToStdout bool
