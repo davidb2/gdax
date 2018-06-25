@@ -5,10 +5,4 @@ before_install:
   - cp .netrc ~
   - chmod 600 .netrc
 script:
-  - go build
-  - if [ -n "$(gofmt -l .)" ]; then
-      echo "Code is not formatted correctly:"
-      gofmt -d .
-      exit 1
-    fi
-  - go test ./...
+  - go build && gofmt -d . && go test ./...
