@@ -1,8 +1,20 @@
 language: go
 go:
   - "1.10"
+env:
+  - CODECOV_TOKEN=7d00059e-7c3b-4ab4-ba5e-9b3fc0494062
 before_install:
   - cp .netrc ~
   - chmod 600 .netrc
+  - go get -t -v ./...
 script:
-  - go build && gofmt -d . && go test ./...
+  - set -e
+  - go build
+  - if [[ -n "$(gofmt -l .)" ]]; then
+      gofmt -d .;
+      exit 1;
+    fi
+  - go test -race -coverprofile=coverage.txt -covermode=atomic
+  - set +e
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
