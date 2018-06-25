@@ -11,8 +11,8 @@ script:
   - set -e
   - go build
   - if [[ -n "$(gofmt -l .)" ]]; then
-      gofmt -d .
-      exit 1
+      gofmt -d .;
+      exit 1;
     fi
   - go test -race -coverprofile=coverage.txt -covermode=atomic
   - set +e
