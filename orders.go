@@ -15,21 +15,26 @@ const (
 	// side
 	Buy  = "buy"
 	Sell = "sell"
+
 	// type
 	Limit  = "limit"
 	Market = "market"
+
 	// stop
 	Loss  = "loss"
 	Entry = "entry"
+
 	// order policy
 	GoodTillTime      = "GTT"
 	GoodTillCancelled = "GTC"
 	ImmediateOrCancel = "IOC"
 	FillOrKill        = "FOK"
+
 	// self-trade prevention
 	DecreaseAndCancel = "dc"
 	CancelOldest      = "co"
 	CancelNewest      = "cn"
+
 	// status
 	Open    = "open"
 	Pending = "pending"
@@ -38,6 +43,7 @@ const (
 	All     = "all"
 )
 
+// An Order represents an order.
 type Order struct {
 	Side        string      `json:"side"`
 	ProductId   string      `json:"product_id"`
@@ -63,18 +69,21 @@ type Order struct {
 	Settled       bool       `json:"settled,omitempty"`
 }
 
+// An OrderCollection is an iterator of Orders.
 type OrderCollection struct {
 	pageableCollection
 	statuses  []string
 	productId string
 }
 
+// An UUIDCollection is an iterator of UUIDs.
 type UUIDCollection struct {
 	pageableCollection
 	productId string
 	orderId   *uuid.UUID
 }
 
+// PlaceMarketOrder places a market order.
 func (accessInfo *AccessInfo) PlaceMarketOrder(order *Order) (*Order, error) {
 	// POST /orders
 	var orderResponse Order
@@ -103,6 +112,7 @@ func (accessInfo *AccessInfo) PlaceMarketOrder(order *Order) (*Order, error) {
 	return &orderResponse, err
 }
 
+// PlaceLimitOrder places a limit order.
 func (accessInfo *AccessInfo) PlaceLimitOrder(order *Order) (*Order, error) {
 	// POST /orders
 	var orderResponse Order
@@ -131,6 +141,8 @@ func (accessInfo *AccessInfo) PlaceLimitOrder(order *Order) (*Order, error) {
 	return &orderResponse, err
 }
 
+// CancelOrder cancels an order with the specified orderId.
+// Note that this function is lazy.
 func (accessInfo *AccessInfo) CancelOrder(orderId *uuid.UUID) *UUIDCollection {
 	uuidCollection := UUIDCollection{
 		pageableCollection: accessInfo.newPageableCollection(false),
@@ -139,10 +151,14 @@ func (accessInfo *AccessInfo) CancelOrder(orderId *uuid.UUID) *UUIDCollection {
 	return &uuidCollection
 }
 
+// CancelAllOrders cancels all orders.
+// Note that this function is lazy.
 func (accessInfo *AccessInfo) CancelAllOrders() *UUIDCollection {
 	return accessInfo.CancelAllOrdersForProduct("")
 }
 
+// CancelAllOrdersForProduct cancels all orders with the specified productId.
+// Note that this function is lazy.
 func (accessInfo *AccessInfo) CancelAllOrdersForProduct(productId string) *UUIDCollection {
 	uuidCollection := UUIDCollection{
 		pageableCollection: accessInfo.newPageableCollection(false),
@@ -151,6 +167,7 @@ func (accessInfo *AccessInfo) CancelAllOrdersForProduct(productId string) *UUIDC
 	return &uuidCollection
 }
 
+// GetOrder gets the order with the specified orderId.
 func (accessInfo *AccessInfo) GetOrder(orderId *uuid.UUID) (*Order, error) {
 	// GET /orders/<order-id>
 	var order Order
@@ -162,10 +179,12 @@ func (accessInfo *AccessInfo) GetOrder(orderId *uuid.UUID) (*Order, error) {
 	return &order, nil
 }
 
+// GetOrders gets all orders with the given statuses.
 func (accessInfo *AccessInfo) GetOrders(statuses ...string) *OrderCollection {
 	return accessInfo.GetOrdersForProduct("", statuses...)
 }
 
+// GetOrdersForProduct gets all orders with the specified productId and specified statuses.
 func (accessInfo *AccessInfo) GetOrdersForProduct(productId string, statuses ...string) *OrderCollection {
 	updatedStatuses := statuses[:]
 	if len(statuses) == 0 {
@@ -179,6 +198,7 @@ func (accessInfo *AccessInfo) GetOrdersForProduct(productId string, statuses ...
 	return &orderCollection
 }
 
+// HasNext determines if there is another Order in this iterator.
 func (c *OrderCollection) HasNext() bool {
 	// GET /orders
 	var orders []Order
@@ -190,6 +210,7 @@ func (c *OrderCollection) HasNext() bool {
 	return c.pageableCollection.hasNext(http.MethodGet, "/orders", strings.Join(stringFilter([]string{statusParams, productParams}, notEmpty), "&"), "", &orders)
 }
 
+// HasNext determines if there is another UUID in this iterator.
 func (c *UUIDCollection) HasNext() bool {
 	// DELETE /orders
 	var (
@@ -207,6 +228,7 @@ func (c *UUIDCollection) HasNext() bool {
 	return c.pageableCollection.hasNext(http.MethodDelete, "/orders", params, "", &cancelledIds)
 }
 
+// Next gets the next Order from the iterator.
 func (c *OrderCollection) Next() (*Order, error) {
 	order, err := c.pageableCollection.next()
 	if err != nil {
@@ -215,6 +237,7 @@ func (c *OrderCollection) Next() (*Order, error) {
 	return order.Addr().Interface().(*Order), nil
 }
 
+// Next gets the next UUID from the iterator.
 func (c *UUIDCollection) Next() (*uuid.UUID, error) {
 	id, err := c.pageableCollection.next()
 	if err != nil {
