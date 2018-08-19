@@ -91,7 +91,6 @@ type Ticker struct {
 	BestAsk   float64    `json:"best_ask,string"`
 }
 
-
 // A Snapshot is channel message sent after subscribing to the snapshot channel.
 type Snapshot struct {
 	message

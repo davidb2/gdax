@@ -76,7 +76,6 @@ type OrderCollection struct {
 	productId string
 }
 
-
 // An UUIDCollection is an iterator of UUIDs.
 type UUIDCollection struct {
 	pageableCollection
