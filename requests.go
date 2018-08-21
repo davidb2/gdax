@@ -81,6 +81,7 @@ func (accessInfo *AccessInfo) collectionRequest(method, path, jsonBody string) (
 
 	cursor := pagination{
 		after: resp.Header.Get("CB-AFTER"),
+		limit: -1,
 	}
 	return string(body), &cursor, nil
 }
@@ -114,6 +115,7 @@ func (accessInfo *AccessInfo) request(method, path, jsonBody string, v interface
 
 	cursor := pagination{
 		after: resp.Header.Get("CB-AFTER"),
+		limit: -1,
 	}
 	err = json.Unmarshal(body, &v)
 	if err != nil {

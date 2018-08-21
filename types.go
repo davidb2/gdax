@@ -79,7 +79,12 @@ func (c *pageableCollection) hasNext(method, path, params, body string, containe
 		return true
 	}
 
-	respBody, cursor, err := c.accessInfo.collectionRequest(method, fmt.Sprintf("%s?%s&%s", path, params, c.pagination), body)
+	totalParams := strings.Join(stringFilter([]string{params, c.pagination.String()}, notEmpty), "&")
+	totalPath := path
+	if notEmpty(totalParams) {
+		totalPath = fmt.Sprintf("%s?%s", totalPath, totalParams)
+	}
+	respBody, cursor, err := c.accessInfo.collectionRequest(method, totalPath, body)
 	if err != nil {
 		c.pendingError = err
 		return true
