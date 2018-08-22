@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/big"
 
+	"github.com/google/uuid"
 	"github.com/ljeabmreosn/gdax"
 )
 
