@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/big"
 
+	"github.com/google/uuid"
 	"github.com/ljeabmreosn/gdax"
 )
 
@@ -88,22 +89,22 @@ func main() {
 		log.SetOutput(ioutil.Discard)
 	}
 
-	// accessInfo, err := gdax.RetrieveAccessInfoFromFile("keys.json")
-	// if err != nil {
-	//  log.Panic(err)
-	// }
-	// accountId, err := uuid.Parse("7f757a16-7f1f-4985-8244-f1ff2e803b33")
-	// log.Println(accountId)
-	// if err != nil {
-	//   log.Panic(err)
-	// }
-	// for accounts := accessInfo.GetAccountHistory(&accountId); accounts.HasNext(); {
-	// 	history, err := accounts.Next()
-	// 	if err != nil {
-	// 		log.Panic(err)
-	// 	}
-	// 	log.Printf("%+v\n", history)
-	// }
+	accessInfo, err := gdax.RetrieveAccessInfoFromFile("keys.json")
+	if err != nil {
+		log.Panic(err)
+	}
+	accountId, err := uuid.Parse("7f757a16-7f1f-4985-8244-f1ff2e803b33")
+	log.Println(accountId)
+	if err != nil {
+		log.Panic(err)
+	}
+	for accounts := accessInfo.GetAccountHistory(&accountId); accounts.HasNext(); {
+		history, err := accounts.Next()
+		if err != nil {
+			log.Panic(err)
+		}
+		log.Printf("%+v\n", history)
+	}
 	// cancelledOrders, err := accessInfo.CancelAllOrders()
 	// if err != nil {
 	//   log.Panic(err)
@@ -176,8 +177,9 @@ func main() {
 	// }
 	// log.Printf("report: %+v\n", report)
 
-	linearRegression = NewLinearRegression()
-	if err := performLinearRegression(); err != nil {
-		panic(err)
-	}
+	// linearRegression = NewLinearRegression()
+	// if err := performLinearRegression(); err != nil {
+	// 	panic(err)
+	// }
+
 }
