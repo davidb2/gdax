@@ -8,17 +8,20 @@ import (
 	"time"
 )
 
+// A pageable is an interface for an iterator.
 type pageable interface {
 	HasNext() bool
 	Next() interface{}
 }
 
+// A pagination represents a cursor.
 type pagination struct {
 	before string
 	after  string
 	limit  int
 }
 
+// A pageableCollection represents an iterator of HTTP responses.
 type pageableCollection struct {
 	currentPage        int
 	currentIndexInPage int
@@ -31,14 +34,19 @@ type pageableCollection struct {
 	pages                 [][]interface{}
 }
 
+// A DayHourMin is a time struct with format mm,hh,dd.
 type DayHourMin struct {
 	time.Time
 }
 
+// MarshalJSON creates JSON from a DayHourMin struct.
 func (d *DayHourMin) MarshalJSON() ([]byte, error) {
 	return []byte(d.Format("mm,hh,dd")), nil
 }
 
+// newPageableCollection creates a new pageable collection.
+// Some pageable collections do not have HTTP paginations cursors (i.e., the HTTP response returns a single JSON array).
+// In this case, "usesPaginationCursors" should be false.
 func (accessInfo *AccessInfo) newPageableCollection(usesPaginationCursors bool) pageableCollection {
 	return pageableCollection{
 		currentPage:           -1,
@@ -69,6 +77,8 @@ func (p pagination) String() string {
 	return strings.Join(stringFilter([]string{before, after, limit}, func(x string) bool { return x != "" }), "&")
 }
 
+// hasNext determines if the pageableCollection has any more elements.
+// Also, this function loads the additional elements into memory if there are more elements.
 func (c *pageableCollection) hasNext(method, path, params, body string, container interface{}) bool {
 	if len(c.pages) == 0 || c.currentIndexInPage == len(c.pages[c.currentPage]) {
 		if len(c.pages) > 0 && !c.usesPaginationCursors {
@@ -79,12 +89,7 @@ func (c *pageableCollection) hasNext(method, path, params, body string, containe
 		return true
 	}
 
-	totalParams := strings.Join(stringFilter([]string{params, c.pagination.String()}, notEmpty), "&")
-	totalPath := path
-	if notEmpty(totalParams) {
-		totalPath = fmt.Sprintf("%s?%s", totalPath, totalParams)
-	}
-	respBody, cursor, err := c.accessInfo.collectionRequest(method, totalPath, body)
+	respBody, cursor, err := c.accessInfo.collectionRequest(method, fmt.Sprintf("%s?%s&%s", path, params, c.pagination), body)
 	if err != nil {
 		c.pendingError = err
 		return true
@@ -113,6 +118,7 @@ func (c *pageableCollection) hasNext(method, path, params, body string, containe
 	return true
 }
 
+// next gets the next element from the pageableCollection.
 func (c *pageableCollection) next() (reflect.Value, error) {
 	if c.pendingError != nil {
 		return reflect.ValueOf(nil), c.pendingError
