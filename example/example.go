@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/big"
 
+	"github.com/google/uuid"
 	"github.com/ljeabmreosn/gdax"
 )
 
@@ -104,6 +105,7 @@ func main() {
 		}
 		log.Printf("%+v\n", history)
 	}
+
 	// cancelledOrders, err := accessInfo.CancelAllOrders()
 	// if err != nil {
 	//   log.Panic(err)
