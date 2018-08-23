@@ -8,7 +8,6 @@ before_install:
   - chmod 600 .netrc
   - go get -t -v ./...
   - go get -u golang.org/x/lint/golint
-  - go get -u golang.org/x/cmd/gofmt
 script:
   - set -e
   - go build
