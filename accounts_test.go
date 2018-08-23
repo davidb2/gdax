@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	accountsJson = `
+	accountsJSON = `
 		[
 		    {
 		        "id": "71452118-efc7-4cc4-8780-a5e22d4baa53",
@@ -32,7 +32,7 @@ const (
 		    }
 		]
 	`
-	accountJson = `
+	accountJSON = `
 		{
 		    "id": "6cf2b1ba-3705-40e6-a41e-69be033514f7",
 		    "balance": "1.100",
@@ -41,7 +41,7 @@ const (
 		    "currency": "USD"
 		}
 	`
-	accountHistoryJson1 = `
+	accountHistoryJSON1 = `
 		[
 		    {
 		        "id": 100,
@@ -57,7 +57,7 @@ const (
 		    }
 		]
 	`
-	accountHistoryJson2 = `
+	accountHistoryJSON2 = `
 		[
 		    {
 		        "id": 100,
@@ -73,7 +73,7 @@ const (
 		    }
 		]
 	`
-	accountHoldJson1 = `
+	accountHoldJSON1 = `
 		[
 		    {
 		        "id": "82dcd140-c3c7-4507-8de4-2c529cd1a28f",
@@ -95,7 +95,7 @@ const (
 		    }
 		]
 	`
-	accountHoldJson2 = `
+	accountHoldJSON2 = `
 		[
 		    {
 		        "id": "e6b60c60-42ed-4329-a311-694d6c897d9b",
@@ -120,7 +120,7 @@ func TestGetAccounts(t *testing.T) {
 	gock.New(EndPoint).
 		Get("/accounts").
 		Reply(http.StatusOK).
-		BodyString(accountsJson)
+		BodyString(accountsJSON)
 
 	var ids = [...]string{"71452118-efc7-4cc4-8780-a5e22d4baa53", "e316cb9a-0808-4fd7-8914-97829c1925de"}
 
@@ -128,10 +128,10 @@ func TestGetAccounts(t *testing.T) {
 		account, err := accounts.Next()
 		assert.NoError(err)
 
-		parsedId, err := uuid.Parse(ids[idx])
+		parsedID, err := uuid.Parse(ids[idx])
 		assert.NoError(err)
 
-		assert.Equal(*account.Id, parsedId)
+		assert.Equal(*account.ID, parsedID)
 	}
 }
 
@@ -146,15 +146,15 @@ func TestGetAccount(t *testing.T) {
 	gock.New(EndPoint).
 		Get(fmt.Sprintf("/accounts/%s", id)).
 		Reply(http.StatusOK).
-		BodyString(accountJson)
+		BodyString(accountJSON)
 
-	parsedId, err := uuid.Parse(id)
+	parsedID, err := uuid.Parse(id)
 	assert.NoError(err)
 
-	account, err := accessInfo.GetAccount(&parsedId)
+	account, err := accessInfo.GetAccount(&parsedID)
 	assert.NoError(err)
 
-	assert.Equal(*account.Id, parsedId)
+	assert.Equal(*account.ID, parsedID)
 }
 
 func TestGetAccountHistory(t *testing.T) {
@@ -165,38 +165,38 @@ func TestGetAccountHistory(t *testing.T) {
 	assert.NoError(err)
 
 	var cursors = [...]int{10, 20}
-	const accountId = "6cf2b1ba-3705-40e6-a41e-69be033514f7"
+	const accountID = "6cf2b1ba-3705-40e6-a41e-69be033514f7"
 	gock.New(EndPoint).
-		Get(fmt.Sprintf("/accounts/%s/ledger", accountId)).
+		Get(fmt.Sprintf("/accounts/%s/ledger", accountID)).
 		Reply(http.StatusOK).
-		BodyString(accountHistoryJson1).
+		BodyString(accountHistoryJSON1).
 		SetHeader("CB-AFTER", strconv.Itoa(cursors[0]))
 	gock.New(EndPoint).
-		Get(fmt.Sprintf("/accounts/%s/ledger", accountId)).
+		Get(fmt.Sprintf("/accounts/%s/ledger", accountID)).
 		MatchParam("after", strconv.Itoa(cursors[0])).
 		Reply(http.StatusOK).
-		BodyString(accountHistoryJson2).
+		BodyString(accountHistoryJSON2).
 		SetHeader("CB-AFTER", strconv.Itoa(cursors[1]))
 	gock.New(EndPoint).
-		Get(fmt.Sprintf("/accounts/%s/ledger", accountId)).
+		Get(fmt.Sprintf("/accounts/%s/ledger", accountID)).
 		MatchParam("after", strconv.Itoa(cursors[1])).
 		Reply(http.StatusOK).
 		BodyString("[]")
 
-	var orderIds = [...]string{"d50ec984-77a8-460a-b958-66f114b0de9b", "62087add-1eea-47fc-b79f-8cde52b458d6"}
+	var orderIDs = [...]string{"d50ec984-77a8-460a-b958-66f114b0de9b", "62087add-1eea-47fc-b79f-8cde52b458d6"}
 
-	parsedAccountId, err := uuid.Parse(accountId)
+	parsedAccountID, err := uuid.Parse(accountID)
 	assert.NoError(err)
 
-	for idx, accountHistories := 0, accessInfo.GetAccountHistory(&parsedAccountId); accountHistories.HasNext(); idx++ {
+	for idx, accountHistories := 0, accessInfo.GetAccountHistory(&parsedAccountID); accountHistories.HasNext(); idx++ {
 		accountHistory, err := accountHistories.Next()
 		assert.NoError(err)
 		t.Log(accountHistory)
 
-		parsedId, err := uuid.Parse(orderIds[idx])
+		parsedID, err := uuid.Parse(orderIDs[idx])
 		assert.NoError(err)
 
-		assert.Equal(*accountHistory.Details.OrderId, parsedId)
+		assert.Equal(*accountHistory.Details.OrderID, parsedID)
 	}
 }
 
@@ -208,20 +208,20 @@ func TestGetAccountHolds(t *testing.T) {
 	assert.NoError(err)
 
 	var cursors = [...]int{10, 20}
-	const accountId = "e0b3f39a-183d-453e-b754-0c13e5bab0b3"
+	const accountID = "e0b3f39a-183d-453e-b754-0c13e5bab0b3"
 	gock.New(EndPoint).
-		Get(fmt.Sprintf("/accounts/%s/holds", accountId)).
+		Get(fmt.Sprintf("/accounts/%s/holds", accountID)).
 		Reply(http.StatusOK).
-		BodyString(accountHoldJson1).
+		BodyString(accountHoldJSON1).
 		SetHeader("CB-AFTER", strconv.Itoa(cursors[0]))
 	gock.New(EndPoint).
-		Get(fmt.Sprintf("/accounts/%s/holds", accountId)).
+		Get(fmt.Sprintf("/accounts/%s/holds", accountID)).
 		MatchParam("after", strconv.Itoa(cursors[0])).
 		Reply(http.StatusOK).
-		BodyString(accountHoldJson2).
+		BodyString(accountHoldJSON2).
 		SetHeader("CB-AFTER", strconv.Itoa(cursors[1]))
 	gock.New(EndPoint).
-		Get(fmt.Sprintf("/accounts/%s/holds", accountId)).
+		Get(fmt.Sprintf("/accounts/%s/holds", accountID)).
 		MatchParam("after", strconv.Itoa(cursors[1])).
 		Reply(http.StatusOK).
 		BodyString("[]")
@@ -229,18 +229,18 @@ func TestGetAccountHolds(t *testing.T) {
 	var ids = [...]string{"82dcd140-c3c7-4507-8de4-2c529cd1a28f", "1fa18826-8f96-4640-b73a-752d85c69326", "e6b60c60-42ed-4329-a311-694d6c897d9b"}
 	var amounts = [...]float64{4.23, 5.25, 6.34}
 
-	parsedAccountId, err := uuid.Parse(accountId)
+	parsedAccountID, err := uuid.Parse(accountID)
 	assert.NoError(err)
 
-	for idx, accountHolds := 0, accessInfo.GetAccountHolds(&parsedAccountId); accountHolds.HasNext(); idx++ {
+	for idx, accountHolds := 0, accessInfo.GetAccountHolds(&parsedAccountID); accountHolds.HasNext(); idx++ {
 		accountHold, err := accountHolds.Next()
 		assert.NoError(err)
 		t.Log(accountHold)
 
-		parsedId, err := uuid.Parse(ids[idx])
+		parsedID, err := uuid.Parse(ids[idx])
 		assert.NoError(err)
 
-		assert.Equal(*accountHold.Id, parsedId)
+		assert.Equal(*accountHold.ID, parsedID)
 		assert.Equal(accountHold.Amount, amounts[idx])
 	}
 }

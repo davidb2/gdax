@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// Entries
 const (
 	TransferEntry = "transfer"
 	MatchEntry    = "match"
@@ -17,18 +18,18 @@ const (
 
 // An Account represents the user's account.
 type Account struct {
-	Id        *uuid.UUID `json:"id,string"`
+	ID        *uuid.UUID `json:"id,string"`
 	Currency  string     `json:"currency"`
 	Balance   float64    `json:"balance,string"`
 	Available float64    `json:"available,string"`
 	Holds     float64    `json:"holds,string"`
-	ProfileId string     `json:"profile_id,omitempty"`
+	ProfileID string     `json:"profile_id,omitempty"`
 }
 
 // An AccountHold represents any holds that the user has.
 type AccountHold struct {
-	Id        *uuid.UUID `json:"id,string"`
-	AccountId *uuid.UUID `json:"account_id,string"`
+	ID        *uuid.UUID `json:"id,string"`
+	AccountID *uuid.UUID `json:"account_id,string"`
 	CreatedAt time.Time  `json:"created_at,string"`
 	UpdatedAt time.Time  `json:"updated_at,string"`
 	Amount    float64    `json:"amount,string"`
@@ -38,14 +39,14 @@ type AccountHold struct {
 
 // An AccountHistoryDetails represents information about past trades that the user has made.
 type AccountHistoryDetails struct {
-	OrderId   *uuid.UUID `json:"order_id,string"`
-	TradeId   string     `json:"trade_id"`
-	ProductId string     `json:"product_id"`
+	OrderID   *uuid.UUID `json:"order_id,string"`
+	TradeID   string     `json:"trade_id"`
+	ProductID string     `json:"product_id"`
 }
 
 // An AccountHistory represents information about the past state(s) of the user's account.
 type AccountHistory struct {
-	Id        int64                 `json:"id"`
+	ID        int64                 `json:"id"`
 	CreatedAt time.Time             `json:"created_at,string"`
 	Amount    float64               `json:"amount,string"`
 	Balance   float64               `json:"balance,string"`
@@ -78,31 +79,31 @@ func (accessInfo *AccessInfo) GetAccounts() *AccountCollection {
 	return &accountCollection
 }
 
-// GetAccount gets an Account with a specified accountId.
-func (accessInfo *AccessInfo) GetAccount(accountId *uuid.UUID) (*Account, error) {
+// GetAccount gets an Account with a specified accountID.
+func (accessInfo *AccessInfo) GetAccount(accountID *uuid.UUID) (*Account, error) {
 	// GET /accounts/<account-id>
 	var account Account
-	_, err := accessInfo.request(http.MethodGet, fmt.Sprintf("/accounts/%s", accountId), "", &account)
+	_, err := accessInfo.request(http.MethodGet, fmt.Sprintf("/accounts/%s", accountID), "", &account)
 	if err != nil {
 		return nil, err
 	}
 	return &account, err
 }
 
-// GetAccountHistory gets all AccountHistorys with a specified accountId.
-func (accessInfo *AccessInfo) GetAccountHistory(accountId *uuid.UUID) *AccountHistoryCollection {
+// GetAccountHistory gets all AccountHistorys with a specified accountID.
+func (accessInfo *AccessInfo) GetAccountHistory(accountID *uuid.UUID) *AccountHistoryCollection {
 	accountHistoryCollection := AccountHistoryCollection{
 		pageableCollection: accessInfo.newPageableCollection(true),
-		id:                 accountId,
+		id:                 accountID,
 	}
 	return &accountHistoryCollection
 }
 
-// GetAccountHolds gets all AcountHolds with a specified accountId.
-func (accessInfo *AccessInfo) GetAccountHolds(accountId *uuid.UUID) *AccountHoldCollection {
+// GetAccountHolds gets all AcountHolds with a specified accountID.
+func (accessInfo *AccessInfo) GetAccountHolds(accountID *uuid.UUID) *AccountHoldCollection {
 	accountHoldCollection := AccountHoldCollection{
 		pageableCollection: accessInfo.newPageableCollection(true),
-		id:                 accountId,
+		id:                 accountID,
 	}
 	return &accountHoldCollection
 }

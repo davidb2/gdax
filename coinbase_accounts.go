@@ -8,7 +8,7 @@ import (
 
 // A CoinbaseAccount stores information about a specific coinbase account.
 type CoinbaseAccount struct {
-	Id       *uuid.UUID `json:"id,string"`
+	ID       *uuid.UUID `json:"id,string"`
 	Name     string     `json:"name"`
 	Balance  float64    `json:"balance,string"`
 	Currency string     `json:"currency"`

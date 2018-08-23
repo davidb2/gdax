@@ -19,6 +19,7 @@ import (
 	ws "github.com/gorilla/websocket"
 )
 
+// EndPoint is the GDAX sandbox endpoint.
 const EndPoint = "https://api-public.sandbox.gdax.com"
 
 // An AccessInfo stores credentials.
