@@ -65,7 +65,7 @@ func performLinearRegression() error {
 	err := gdax.Feed(&gdax.Subscription{
 		Type:       gdax.SubscribeType,
 		Channels:   []string{gdax.MatchesType},
-		ProductIds: []string{"BTC-USD"},
+		ProductIDs: []string{"BTC-USD"},
 	},
 		func(message gdax.Message) {
 			switch message.MessageType() {
@@ -93,12 +93,12 @@ func main() {
 	if err != nil {
 		log.Panic(err)
 	}
-	accountId, err := uuid.Parse("7f757a16-7f1f-4985-8244-f1ff2e803b33")
-	log.Println(accountId)
+	accountID, err := uuid.Parse("7f757a16-7f1f-4985-8244-f1ff2e803b33")
+	log.Println(accountID)
 	if err != nil {
 		log.Panic(err)
 	}
-	for accounts := accessInfo.GetAccountHistory(&accountId); accounts.HasNext(); {
+	for accounts := accessInfo.GetAccountHistory(&accountID); accounts.HasNext(); {
 		history, err := accounts.Next()
 		if err != nil {
 			log.Panic(err)
@@ -113,7 +113,7 @@ func main() {
 	// log.Println("Cancelled all orders", cancelledOrders)
 	// orderResponse, err := accessInfo.PlaceLimitOrder(&gdax.Order{
 	//   Side: gdax.Buy,
-	//   ProductId: "BTC-USD",
+	//   ProductID: "BTC-USD",
 	//   Price: 700,
 	//   Size: 0.01,
 	// })
@@ -128,8 +128,8 @@ func main() {
 	//   if err != nil {
 	//     log.Panic(err)
 	//   }
-	//   log.Println("order", order.Id)
-	//   o, err := accessInfo.GetOrder(order.Id)
+	//   log.Println("order", order.ID)
+	//   o, err := accessInfo.GetOrder(order.ID)
 	//   if err != nil {
 	//     log.Panic(err)
 	//   }

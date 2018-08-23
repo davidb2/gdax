@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// Fills
 const (
 	Maker = "M"
 	Taker = "T"
@@ -16,11 +17,11 @@ const (
 
 // A Fill represents a fill order.
 type Fill struct {
-	TradeId   int64      `json:"trade_id"`
-	ProductId string     `json:"product_id"`
+	TradeID   int64      `json:"trade_id"`
+	ProductID string     `json:"product_id"`
 	Price     float64    `json:"price,string"`
 	Size      float64    `json:"size,string"`
-	OrderId   *uuid.UUID `json:"order_id,string"`
+	OrderID   *uuid.UUID `json:"order_id,string"`
 	CreatedAt *time.Time `json:"created_at,string"`
 	Liquidity string     `json:"liquidity"`
 	Fee       float64    `json:"fee,string"`
@@ -31,25 +32,25 @@ type Fill struct {
 // A FillCollection is an iterator of Fills.
 type FillCollection struct {
 	pageableCollection
-	orderId   *uuid.UUID
-	productId string
+	orderID   *uuid.UUID
+	productID string
 }
 
-// GetFills gets all fills with the specified orderIds.
-func (accessInfo *AccessInfo) GetFills(orderId ...*uuid.UUID) *FillCollection {
-	return accessInfo.GetFillsForProduct("", orderId...)
+// GetFills gets all fills with the specified orderIDs.
+func (accessInfo *AccessInfo) GetFills(orderID ...*uuid.UUID) *FillCollection {
+	return accessInfo.GetFillsForProduct("", orderID...)
 }
 
-// GetFillsForProduct gets all fills for a specified productId and specified orderIds.
-func (accessInfo *AccessInfo) GetFillsForProduct(productId string, orderId ...*uuid.UUID) *FillCollection {
-	var realOrderId *uuid.UUID
-	if len(orderId) > 0 {
-		realOrderId = orderId[0]
+// GetFillsForProduct gets all fills for a specified productID and specified orderIDs.
+func (accessInfo *AccessInfo) GetFillsForProduct(productID string, orderID ...*uuid.UUID) *FillCollection {
+	var realOrderID *uuid.UUID
+	if len(orderID) > 0 {
+		realOrderID = orderID[0]
 	}
 	fillCollection := FillCollection{
 		pageableCollection: accessInfo.newPageableCollection(true),
-		orderId:            realOrderId,
-		productId:          productId,
+		orderID:            realOrderID,
+		productID:          productID,
 	}
 	return &fillCollection
 }
@@ -63,11 +64,11 @@ func (c *FillCollection) HasNext() bool {
 		fills        []Fill
 	)
 
-	if c.orderId != nil {
-		orderParam = fmt.Sprintf("order_id=%s", c.orderId)
+	if c.orderID != nil {
+		orderParam = fmt.Sprintf("order_id=%s", c.orderID)
 	}
-	if c.productId != "" {
-		productParam = fmt.Sprintf("product_id=%s", c.productId)
+	if c.productID != "" {
+		productParam = fmt.Sprintf("product_id=%s", c.productID)
 	}
 
 	params := strings.Join(stringFilter([]string{orderParam, productParam}, notEmpty), "&")

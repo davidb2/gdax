@@ -11,32 +11,27 @@ import (
 	"github.com/imdario/mergo"
 )
 
+// Order Constants
 const (
-	// side
-	Buy  = "buy"
+	Buy  = "buy" // Side
 	Sell = "sell"
 
-	// type
-	Limit  = "limit"
+	Limit  = "limit" // Type
 	Market = "market"
 
-	// stop
-	Loss  = "loss"
+	Loss  = "loss" // Stop
 	Entry = "entry"
 
-	// order policy
-	GoodTillTime      = "GTT"
+	GoodTillTime      = "GTT" // Order Policy
 	GoodTillCancelled = "GTC"
 	ImmediateOrCancel = "IOC"
 	FillOrKill        = "FOK"
 
-	// self-trade prevention
-	DecreaseAndCancel = "dc"
+	DecreaseAndCancel = "dc" // Self-Trade Prevention
 	CancelOldest      = "co"
 	CancelNewest      = "cn"
 
-	// status
-	Open    = "open"
+	Open    = "open" // Status
 	Pending = "pending"
 	Active  = "active"
 	Done    = "done"
@@ -46,7 +41,7 @@ const (
 // An Order represents an order.
 type Order struct {
 	Side        string      `json:"side"`
-	ProductId   string      `json:"product_id"`
+	ProductID   string      `json:"product_id"`
 	Type        string      `json:"type,omitempty"`
 	ClientOid   *uuid.UUID  `json:"client_oid,string,omitempty"`
 	Stp         string      `json:"stp,omitempty"`
@@ -57,7 +52,7 @@ type Order struct {
 	Funds       float64     `json:"funds,string,omitempty"`
 
 	// additional fields
-	Id            *uuid.UUID `json:"id,string,omitempty"`
+	ID            *uuid.UUID `json:"id,string,omitempty"`
 	Price         float64    `json:"price,string,omitempty"`
 	Size          float64    `json:"size,string,omitempty"`
 	PostOnly      bool       `json:"post_only,omitempty"`
@@ -73,14 +68,14 @@ type Order struct {
 type OrderCollection struct {
 	pageableCollection
 	statuses  []string
-	productId string
+	productID string
 }
 
 // An UUIDCollection is an iterator of UUIDs.
 type UUIDCollection struct {
 	pageableCollection
-	productId string
-	orderId   *uuid.UUID
+	productID string
+	orderID   *uuid.UUID
 }
 
 // PlaceMarketOrder places a market order.
@@ -95,12 +90,12 @@ func (accessInfo *AccessInfo) PlaceMarketOrder(order *Order) (*Order, error) {
 		order.ClientOid = &clientOid
 	}
 
-	orderJson, err := json.Marshal(*order)
+	orderJSON, err := json.Marshal(*order)
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = accessInfo.request(http.MethodPost, "/orders", string(orderJson), &orderResponse)
+	_, err = accessInfo.request(http.MethodPost, "/orders", string(orderJSON), &orderResponse)
 	if err != nil {
 		return nil, err
 	}
@@ -124,12 +119,12 @@ func (accessInfo *AccessInfo) PlaceLimitOrder(order *Order) (*Order, error) {
 		order.ClientOid = &clientOid
 	}
 
-	orderJson, err := json.Marshal(*order)
+	orderJSON, err := json.Marshal(*order)
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = accessInfo.request(http.MethodPost, "/orders", string(orderJson), &orderResponse)
+	_, err = accessInfo.request(http.MethodPost, "/orders", string(orderJSON), &orderResponse)
 	if err != nil {
 		return nil, err
 	}
@@ -141,12 +136,12 @@ func (accessInfo *AccessInfo) PlaceLimitOrder(order *Order) (*Order, error) {
 	return &orderResponse, err
 }
 
-// CancelOrder cancels an order with the specified orderId.
+// CancelOrder cancels an order with the specified orderID.
 // Note that this function is lazy.
-func (accessInfo *AccessInfo) CancelOrder(orderId *uuid.UUID) *UUIDCollection {
+func (accessInfo *AccessInfo) CancelOrder(orderID *uuid.UUID) *UUIDCollection {
 	uuidCollection := UUIDCollection{
 		pageableCollection: accessInfo.newPageableCollection(false),
-		orderId:            orderId,
+		orderID:            orderID,
 	}
 	return &uuidCollection
 }
@@ -157,22 +152,22 @@ func (accessInfo *AccessInfo) CancelAllOrders() *UUIDCollection {
 	return accessInfo.CancelAllOrdersForProduct("")
 }
 
-// CancelAllOrdersForProduct cancels all orders with the specified productId.
+// CancelAllOrdersForProduct cancels all orders with the specified productID.
 // Note that this function is lazy.
-func (accessInfo *AccessInfo) CancelAllOrdersForProduct(productId string) *UUIDCollection {
+func (accessInfo *AccessInfo) CancelAllOrdersForProduct(productID string) *UUIDCollection {
 	uuidCollection := UUIDCollection{
 		pageableCollection: accessInfo.newPageableCollection(false),
-		productId:          productId,
+		productID:          productID,
 	}
 	return &uuidCollection
 }
 
-// GetOrder gets the order with the specified orderId.
-func (accessInfo *AccessInfo) GetOrder(orderId *uuid.UUID) (*Order, error) {
+// GetOrder gets the order with the specified orderID.
+func (accessInfo *AccessInfo) GetOrder(orderID *uuid.UUID) (*Order, error) {
 	// GET /orders/<order-id>
 	var order Order
 
-	_, err := accessInfo.request(http.MethodGet, fmt.Sprintf("/orders/%s", orderId), "", &order)
+	_, err := accessInfo.request(http.MethodGet, fmt.Sprintf("/orders/%s", orderID), "", &order)
 	if err != nil {
 		return nil, err
 	}
@@ -184,8 +179,8 @@ func (accessInfo *AccessInfo) GetOrders(statuses ...string) *OrderCollection {
 	return accessInfo.GetOrdersForProduct("", statuses...)
 }
 
-// GetOrdersForProduct gets all orders with the specified productId and specified statuses.
-func (accessInfo *AccessInfo) GetOrdersForProduct(productId string, statuses ...string) *OrderCollection {
+// GetOrdersForProduct gets all orders with the specified productID and specified statuses.
+func (accessInfo *AccessInfo) GetOrdersForProduct(productID string, statuses ...string) *OrderCollection {
 	updatedStatuses := statuses[:]
 	if len(statuses) == 0 {
 		updatedStatuses = append(updatedStatuses, All)
@@ -193,7 +188,7 @@ func (accessInfo *AccessInfo) GetOrdersForProduct(productId string, statuses ...
 	orderCollection := OrderCollection{
 		pageableCollection: accessInfo.newPageableCollection(true),
 		statuses:           updatedStatuses,
-		productId:          productId,
+		productID:          productID,
 	}
 	return &orderCollection
 }
@@ -204,8 +199,8 @@ func (c *OrderCollection) HasNext() bool {
 	var orders []Order
 	statusParams := strings.Join(stringMap(c.statuses, func(s string) string { return "status=" + s }), "&")
 	productParams := ""
-	if c.productId != "" {
-		productParams = fmt.Sprintf("product_id=%s", c.productId)
+	if c.productID != "" {
+		productParams = fmt.Sprintf("product_id=%s", c.productID)
 	}
 	return c.pageableCollection.hasNext(http.MethodGet, "/orders", strings.Join(stringFilter([]string{statusParams, productParams}, notEmpty), "&"), "", &orders)
 }
@@ -214,18 +209,18 @@ func (c *OrderCollection) HasNext() bool {
 func (c *UUIDCollection) HasNext() bool {
 	// DELETE /orders
 	var (
-		productIdParam string
-		orderIdParam   string
-		cancelledIds   []uuid.UUID
+		productIDParam string
+		orderIDParam   string
+		cancelledIDs   []uuid.UUID
 	)
-	if c.productId != "" {
-		productIdParam = "product_id=" + c.productId
+	if c.productID != "" {
+		productIDParam = "product_id=" + c.productID
 	}
-	if c.orderId != nil {
-		orderIdParam = "order_id=" + c.orderId.String()
+	if c.orderID != nil {
+		orderIDParam = "order_id=" + c.orderID.String()
 	}
-	params := strings.Join(stringFilter([]string{productIdParam, orderIdParam}, notEmpty), "&")
-	return c.pageableCollection.hasNext(http.MethodDelete, "/orders", params, "", &cancelledIds)
+	params := strings.Join(stringFilter([]string{productIDParam, orderIDParam}, notEmpty), "&")
+	return c.pageableCollection.hasNext(http.MethodDelete, "/orders", params, "", &cancelledIDs)
 }
 
 // Next gets the next Order from the iterator.

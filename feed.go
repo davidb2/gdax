@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// Subscriptions
 const (
 	SubscriptionsType = "subscriptions"
 	HeartbeatType     = "heartbeat"
@@ -33,7 +34,7 @@ type Message interface {
 // A message stores information about a single message sent in a channel.
 type message struct {
 	Type      string `json:"type"`
-	ProductId string `json:"product_id,,omitempty"`
+	ProductID string `json:"product_id,,omitempty"`
 }
 
 // A Bid stores a single bid from a snapshot.
@@ -66,24 +67,24 @@ type Error struct {
 type Subscription struct {
 	Type       string   `json:"type"`
 	Channels   []string `json:"channels"`
-	ProductIds []string `json:"product_ids"`
+	ProductIDs []string `json:"product_ids"`
 }
 
 // A Heartbeat is channel message sent after subscribing to the heartbeat channel.
 type Heartbeat struct {
 	message
 	Sequence    int64      `json:"sequence"`
-	LastTradeId int64      `json:"last_trade_id"`
+	LastTradeID int64      `json:"last_trade_id"`
 	Time        *time.Time `json:"time,string"`
 }
 
 // A Ticker is channel message sent after subscribing to the ticker channel.
 type Ticker struct {
 	message
-	TradeId   int64      `json:"trade_id"`
+	TradeID   int64      `json:"trade_id"`
 	Sequence  int64      `json:"sequence"`
 	Time      *time.Time `json:"time,string"`
-	ProductId string     `json:"product_id"`
+	ProductID string     `json:"product_id"`
 	Price     float64    `json:"price,string"`
 	Side      string     `json:"side"`
 	LastSize  float64    `json:"last_size,string"`
@@ -94,7 +95,7 @@ type Ticker struct {
 // A Snapshot is channel message sent after subscribing to the snapshot channel.
 type Snapshot struct {
 	message
-	ProductId string `json:"product_id"`
+	ProductID string `json:"product_id"`
 	Bids      []Bid  `json:"bids"`
 	Asks      []Ask  `json:"asks"`
 }
@@ -110,9 +111,9 @@ type Match struct {
 	message
 	Time         *time.Time `json:"time,string"`
 	Sequence     int64      `json:"sequence"`
-	TradeId      int64      `json:"trade_id"`
-	MakerOrderId *uuid.UUID `json:"maker_order_id,string"`
-	TakerOrderId *uuid.UUID `json:"taker_order_id,string"`
+	TradeID      int64      `json:"trade_id"`
+	MakerOrderID *uuid.UUID `json:"maker_order_id,string"`
+	TakerOrderID *uuid.UUID `json:"taker_order_id,string"`
 	Size         float64    `json:"size,string"`
 	Price        float64    `json:"price,string"`
 	Side         string     `json:"side"`
@@ -139,7 +140,7 @@ func (m *L2Update) UnmarshalJSON(b []byte) error {
 		case "type":
 			m.Type = val.(string)
 		case "product_id":
-			m.ProductId = val.(string)
+			m.ProductID = val.(string)
 		case "changes":
 			for _, e := range val.([]interface{}) {
 				side := e.([]interface{})[0].(string)
@@ -169,7 +170,7 @@ func (m *Snapshot) UnmarshalJSON(b []byte) error {
 		case "type":
 			m.Type = val.(string)
 		case "product_id":
-			m.ProductId = val.(string)
+			m.ProductID = val.(string)
 		case "bids":
 			for _, e := range val.([]interface{}) {
 				price, err := strconv.ParseFloat(e.([]interface{})[0].(string), 64)
