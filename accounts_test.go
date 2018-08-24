@@ -110,6 +110,27 @@ const (
 	`
 )
 
+func TestGetAccountsError(t *testing.T) {
+	defer gock.Off()
+	assert := assert.New(t)
+
+	accessInfo, err := RetrieveAccessInfoFromEnvironmentVariables()
+	assert.NoError(err)
+
+	gock.New(EndPoint).
+		Get("/accounts").
+		Reply(http.StatusNotFound).
+		BodyString(`{"message": "Account id not found"}`)
+
+	accounts := accessInfo.GetAccounts()
+	assert.True(accounts.HasNext())
+
+	account, err := accounts.Next()
+	assert.Error(err)
+	assert.Nil(account)
+	assert.Equal(err.Error(), "Account id not found")
+}
+
 func TestGetAccounts(t *testing.T) {
 	defer gock.Off()
 	assert := assert.New(t)
@@ -135,6 +156,28 @@ func TestGetAccounts(t *testing.T) {
 	}
 }
 
+func TestGetAccountError(t *testing.T) {
+	defer gock.Off()
+	assert := assert.New(t)
+
+	accessInfo, err := RetrieveAccessInfoFromEnvironmentVariables()
+	assert.NoError(err)
+
+	const id = "6cf2b1ba-3705-40e6-a41e-69be033514f7"
+	gock.New(EndPoint).
+		Get(fmt.Sprintf("/accounts/%s", id)).
+		Reply(http.StatusNotFound).
+		BodyString(`{"message": "Account id not found"}`)
+
+	parsedID, err := uuid.Parse(id)
+	assert.NoError(err)
+
+	account, err := accessInfo.GetAccount(&parsedID)
+	assert.Error(err)
+	assert.Nil(account)
+	assert.Equal(err.Error(), "Account id not found")
+}
+
 func TestGetAccount(t *testing.T) {
 	defer gock.Off()
 	assert := assert.New(t)
@@ -155,6 +198,31 @@ func TestGetAccount(t *testing.T) {
 	assert.NoError(err)
 
 	assert.Equal(*account.ID, parsedID)
+}
+
+func TestGetAccountHistoryError(t *testing.T) {
+	defer gock.Off()
+	assert := assert.New(t)
+
+	accessInfo, err := RetrieveAccessInfoFromEnvironmentVariables()
+	assert.NoError(err)
+
+	const accountID = "6cf2b1ba-3705-40e6-a41e-69be033514f7"
+	gock.New(EndPoint).
+		Get(fmt.Sprintf("/accounts/%s/ledger", accountID)).
+		Reply(http.StatusNotFound).
+		BodyString(`{"message": "Account id not found"}`)
+
+	parsedAccountID, err := uuid.Parse(accountID)
+	assert.NoError(err)
+
+	accountHistories := accessInfo.GetAccountHistory(&parsedAccountID)
+	assert.True(accountHistories.HasNext())
+
+	accountHistory, err := accountHistories.Next()
+	assert.Error(err)
+	assert.Nil(accountHistory)
+	assert.Equal(err.Error(), "Account id not found")
 }
 
 func TestGetAccountHistory(t *testing.T) {
@@ -198,6 +266,31 @@ func TestGetAccountHistory(t *testing.T) {
 
 		assert.Equal(*accountHistory.Details.OrderID, parsedID)
 	}
+}
+
+func TestGetAccountHoldsError(t *testing.T) {
+	defer gock.Off()
+	assert := assert.New(t)
+
+	accessInfo, err := RetrieveAccessInfoFromEnvironmentVariables()
+	assert.NoError(err)
+
+	const accountID = "6cf2b1ba-3705-40e6-a41e-69be033514f7"
+	gock.New(EndPoint).
+		Get(fmt.Sprintf("/accounts/%s/holds", accountID)).
+		Reply(http.StatusNotFound).
+		BodyString(`{"message": "Account id not found"}`)
+
+	parsedAccountID, err := uuid.Parse(accountID)
+	assert.NoError(err)
+
+	accountHolds := accessInfo.GetAccountHolds(&parsedAccountID)
+	assert.True(accountHolds.HasNext())
+
+	accountHold, err := accountHolds.Next()
+	assert.Error(err)
+	assert.Nil(accountHold)
+	assert.Equal(err.Error(), "Account id not found")
 }
 
 func TestGetAccountHolds(t *testing.T) {
