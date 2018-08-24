@@ -16,7 +16,7 @@ script:
       exit 1;
     fi
   - golint -set_exit_status .
-  - go test -race -coverprofile=coverage.txt -covermode=atomic *.go
+  - go test -failfast -race -coverprofile=coverage.txt -covermode=atomic *.go
   - set +e
 after_success:
   - bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN
