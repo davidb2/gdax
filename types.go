@@ -74,7 +74,7 @@ func (p pagination) String() string {
 	if p.limit != -1 {
 		limit = fmt.Sprintf("limit=%d", p.limit)
 	}
-	return strings.Join(stringFilter([]string{before, after, limit}, func(x string) bool { return x != "" }), "&")
+	return strings.Join(stringFilter([]string{before, after, limit}, notEmpty), "&")
 }
 
 // hasNext determines if the pageableCollection has any more elements.
