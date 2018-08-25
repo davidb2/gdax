@@ -1,4 +1,4 @@
-package gdax
+package gdax_test
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/ljeabmreosn/gdax"
 	"github.com/stretchr/testify/assert"
 	gock "gopkg.in/h2non/gock.v1"
 )
@@ -114,10 +115,10 @@ func TestGetAccountsError(t *testing.T) {
 	defer gock.Off()
 	assert := assert.New(t)
 
-	accessInfo, err := RetrieveAccessInfoFromEnvironmentVariables()
+	accessInfo, err := gdax.RetrieveAccessInfoFromEnvironmentVariables()
 	assert.NoError(err)
 
-	gock.New(EndPoint).
+	gock.New(gdax.EndPoint).
 		Get("/accounts").
 		Reply(http.StatusNotFound).
 		BodyString(`{"message": "Account id not found"}`)
@@ -135,10 +136,10 @@ func TestGetAccounts(t *testing.T) {
 	defer gock.Off()
 	assert := assert.New(t)
 
-	accessInfo, err := RetrieveAccessInfoFromEnvironmentVariables()
+	accessInfo, err := gdax.RetrieveAccessInfoFromEnvironmentVariables()
 	assert.NoError(err)
 
-	gock.New(EndPoint).
+	gock.New(gdax.EndPoint).
 		Get("/accounts").
 		Reply(http.StatusOK).
 		BodyString(accountsJSON)
@@ -160,11 +161,11 @@ func TestGetAccountError(t *testing.T) {
 	defer gock.Off()
 	assert := assert.New(t)
 
-	accessInfo, err := RetrieveAccessInfoFromEnvironmentVariables()
+	accessInfo, err := gdax.RetrieveAccessInfoFromEnvironmentVariables()
 	assert.NoError(err)
 
 	const id = "6cf2b1ba-3705-40e6-a41e-69be033514f7"
-	gock.New(EndPoint).
+	gock.New(gdax.EndPoint).
 		Get(fmt.Sprintf("/accounts/%s", id)).
 		Reply(http.StatusNotFound).
 		BodyString(`{"message": "Account id not found"}`)
@@ -182,11 +183,11 @@ func TestGetAccount(t *testing.T) {
 	defer gock.Off()
 	assert := assert.New(t)
 
-	accessInfo, err := RetrieveAccessInfoFromEnvironmentVariables()
+	accessInfo, err := gdax.RetrieveAccessInfoFromEnvironmentVariables()
 	assert.NoError(err)
 
 	const id = "6cf2b1ba-3705-40e6-a41e-69be033514f7"
-	gock.New(EndPoint).
+	gock.New(gdax.EndPoint).
 		Get(fmt.Sprintf("/accounts/%s", id)).
 		Reply(http.StatusOK).
 		BodyString(accountJSON)
@@ -204,11 +205,11 @@ func TestGetAccountHistoryError(t *testing.T) {
 	defer gock.Off()
 	assert := assert.New(t)
 
-	accessInfo, err := RetrieveAccessInfoFromEnvironmentVariables()
+	accessInfo, err := gdax.RetrieveAccessInfoFromEnvironmentVariables()
 	assert.NoError(err)
 
 	const accountID = "6cf2b1ba-3705-40e6-a41e-69be033514f7"
-	gock.New(EndPoint).
+	gock.New(gdax.EndPoint).
 		Get(fmt.Sprintf("/accounts/%s/ledger", accountID)).
 		Reply(http.StatusNotFound).
 		BodyString(`{"message": "Account id not found"}`)
@@ -229,23 +230,23 @@ func TestGetAccountHistory(t *testing.T) {
 	defer gock.Off()
 	assert := assert.New(t)
 
-	accessInfo, err := RetrieveAccessInfoFromEnvironmentVariables()
+	accessInfo, err := gdax.RetrieveAccessInfoFromEnvironmentVariables()
 	assert.NoError(err)
 
 	var cursors = [...]int{10, 20}
 	const accountID = "6cf2b1ba-3705-40e6-a41e-69be033514f7"
-	gock.New(EndPoint).
+	gock.New(gdax.EndPoint).
 		Get(fmt.Sprintf("/accounts/%s/ledger", accountID)).
 		Reply(http.StatusOK).
 		BodyString(accountHistoryJSON1).
 		SetHeader("CB-AFTER", strconv.Itoa(cursors[0]))
-	gock.New(EndPoint).
+	gock.New(gdax.EndPoint).
 		Get(fmt.Sprintf("/accounts/%s/ledger", accountID)).
 		MatchParam("after", strconv.Itoa(cursors[0])).
 		Reply(http.StatusOK).
 		BodyString(accountHistoryJSON2).
 		SetHeader("CB-AFTER", strconv.Itoa(cursors[1]))
-	gock.New(EndPoint).
+	gock.New(gdax.EndPoint).
 		Get(fmt.Sprintf("/accounts/%s/ledger", accountID)).
 		MatchParam("after", strconv.Itoa(cursors[1])).
 		Reply(http.StatusOK).
@@ -272,11 +273,11 @@ func TestGetAccountHoldsError(t *testing.T) {
 	defer gock.Off()
 	assert := assert.New(t)
 
-	accessInfo, err := RetrieveAccessInfoFromEnvironmentVariables()
+	accessInfo, err := gdax.RetrieveAccessInfoFromEnvironmentVariables()
 	assert.NoError(err)
 
 	const accountID = "6cf2b1ba-3705-40e6-a41e-69be033514f7"
-	gock.New(EndPoint).
+	gock.New(gdax.EndPoint).
 		Get(fmt.Sprintf("/accounts/%s/holds", accountID)).
 		Reply(http.StatusNotFound).
 		BodyString(`{"message": "Account id not found"}`)
@@ -297,23 +298,23 @@ func TestGetAccountHolds(t *testing.T) {
 	defer gock.Off()
 	assert := assert.New(t)
 
-	accessInfo, err := RetrieveAccessInfoFromEnvironmentVariables()
+	accessInfo, err := gdax.RetrieveAccessInfoFromEnvironmentVariables()
 	assert.NoError(err)
 
 	var cursors = [...]int{10, 20}
 	const accountID = "e0b3f39a-183d-453e-b754-0c13e5bab0b3"
-	gock.New(EndPoint).
+	gock.New(gdax.EndPoint).
 		Get(fmt.Sprintf("/accounts/%s/holds", accountID)).
 		Reply(http.StatusOK).
 		BodyString(accountHoldJSON1).
 		SetHeader("CB-AFTER", strconv.Itoa(cursors[0]))
-	gock.New(EndPoint).
+	gock.New(gdax.EndPoint).
 		Get(fmt.Sprintf("/accounts/%s/holds", accountID)).
 		MatchParam("after", strconv.Itoa(cursors[0])).
 		Reply(http.StatusOK).
 		BodyString(accountHoldJSON2).
 		SetHeader("CB-AFTER", strconv.Itoa(cursors[1]))
-	gock.New(EndPoint).
+	gock.New(gdax.EndPoint).
 		Get(fmt.Sprintf("/accounts/%s/holds", accountID)).
 		MatchParam("after", strconv.Itoa(cursors[1])).
 		Reply(http.StatusOK).
