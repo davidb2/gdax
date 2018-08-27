@@ -6,7 +6,8 @@ env:
 before_install:
   - cp .netrc ~
   - chmod 600 .netrc
-  - go get -t -v ./...
+  - go get -v ./...
+  - go get -tags=unit ./...
   - go get -u golang.org/x/lint/golint
 script:
   - set -e
