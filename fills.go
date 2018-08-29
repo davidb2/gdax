@@ -32,24 +32,20 @@ type Fill struct {
 // A FillCollection is an iterator of Fills.
 type FillCollection struct {
 	pageableCollection
-	orderID   *uuid.UUID
+	orderIDs  []*uuid.UUID
 	productID string
 }
 
 // GetFills gets all fills with the specified orderIDs.
-func (accessInfo *AccessInfo) GetFills(orderID ...*uuid.UUID) *FillCollection {
-	return accessInfo.GetFillsForProduct("", orderID...)
+func (accessInfo *AccessInfo) GetFills(orderIDs ...*uuid.UUID) *FillCollection {
+	return accessInfo.GetFillsForProduct("", orderIDs...)
 }
 
 // GetFillsForProduct gets all fills for a specified productID and specified orderIDs.
-func (accessInfo *AccessInfo) GetFillsForProduct(productID string, orderID ...*uuid.UUID) *FillCollection {
-	var realOrderID *uuid.UUID
-	if len(orderID) > 0 {
-		realOrderID = orderID[0]
-	}
+func (accessInfo *AccessInfo) GetFillsForProduct(productID string, orderIDs ...*uuid.UUID) *FillCollection {
 	fillCollection := FillCollection{
 		pageableCollection: accessInfo.newPageableCollection(true),
-		orderID:            realOrderID,
+		orderIDs:           orderIDs,
 		productID:          productID,
 	}
 	return &fillCollection
@@ -64,8 +60,12 @@ func (c *FillCollection) HasNext() bool {
 		fills        []Fill
 	)
 
-	if c.orderID != nil {
-		orderParam = fmt.Sprintf("order_id=%s", c.orderID)
+	if c.orderIDs != nil {
+		unparsedOrderIDs := make([]string, len(c.orderIDs))
+		for idx, orderID := range c.orderIDs {
+			unparsedOrderIDs[idx] = orderID.String()
+		}
+		orderParam = fmt.Sprintf("order_id=%s", strings.Join(unparsedOrderIDs, ","))
 	}
 	if c.productID != "" {
 		productParam = fmt.Sprintf("product_id=%s", c.productID)
