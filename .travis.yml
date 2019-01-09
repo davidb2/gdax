@@ -4,7 +4,8 @@ go:
 before_install:
   - cp .netrc ~
   - chmod 600 .netrc
-  - go get -t -v ./...
+  - go get -v ./...
+  - go get -tags=unit ./...
   - go get -u golang.org/x/lint/golint
 script:
   - set -e
@@ -14,7 +15,7 @@ script:
       exit 1;
     fi
   - golint -set_exit_status .
-  - go test -failfast -race -coverprofile=coverage.txt -covermode=atomic .
+  - go test -failfast -tags=unit -race -coverprofile=coverage.txt -covermode=atomic .
   - set +e
 after_success:
   - bash <(curl -s https://codecov.io/bash)
